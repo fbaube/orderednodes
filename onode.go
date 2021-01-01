@@ -30,8 +30,11 @@ type ONode struct {
 	// Its use is optional, and also it can be used in other ways in structs
 	// that embed ONode.
 	seqId int
-	// parSeqId and kidSeqIds (values sep'd by commas) can add a layer of error
-	// checking and simplified access. Their use is optional.
+	// parSeqId and kidSeqIds can add a layer of error checking and
+	// simplified access. Their use is optional.
+	// kidSeqIds when empty is ",", otherwise e.g. ",1,4,56,". The
+	// seqIds should be in the same order as the Kid nodes themselves.
+	// The bracketing by commas makes searching simpler.
 	parSeqId, kidSeqIds string
 }
 

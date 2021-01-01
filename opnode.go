@@ -1,10 +1,12 @@
 package orderednodes
 
+/*
 import (
 	"fmt"
 	"os"
 	S "strings"
 )
+*/
 
 // Ignore https://godoc.org/golang.org/x/net/html#Node
 
@@ -28,6 +30,8 @@ type RootOPNode OPNode
 type OPNoder interface {
 
 }
+
+/*
 
 // Parent returns the parent, duh.
 func (p *ONode) Parent() *ONode {
@@ -125,7 +129,7 @@ func (p ONode) StringRecursively(s string, iLvl int) string {
 	}
 	return s
 }
-*/
+* /
 
 func (p *ONode) KidsAsSlice() []*ONode {
 	var pp []*ONode
@@ -136,3 +140,4 @@ func (p *ONode) KidsAsSlice() []*ONode {
 	}
 	return pp
 }
+*/
