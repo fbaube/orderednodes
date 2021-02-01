@@ -61,8 +61,7 @@ func (pRoot *FilePropsNord) FindONoderByPath(path string) Norder {
 	var onr Norder
 	// var ok bool
 	onr = pRoot
-	// e := WalkONoders(&(pRoot.ONode), wfnFindPath); if e != nil {
-	e := WalkNorderTree(onr, wfnFindPath)
+	e := WalkNorders(onr, nvfFindPath)
 	if e != nil {
 		println("wfnFindPath ERR:", e.Error())
 		return nil
@@ -74,7 +73,7 @@ func (pRoot *FilePropsNord) FindONoderByPath(path string) Norder {
 	return pathIsFound
 }
 
-func wfnFindPath(p Norder) error {
+func nvfFindPath(p Norder) error {
 	if pathToBeFound == p.RelFP() {
 		pathIsFound = p
 	}

@@ -6,6 +6,6 @@ import (
 
 type FileNord struct {
 	Nord
-	argPath string // relFP
-	absFP   FU.AbsFilePath
+	Path string // relFP
+	FU.AbsFilePath
 }

@@ -2,6 +2,7 @@ package orderednodes
 
 import (
 	"fmt"
+	"io"
 	"os"
 	S "strings"
 )
@@ -51,6 +52,11 @@ func (p *Nord) IsRoot() bool {
 	return p.isRoot
 }
 
+// SetIsRoot is duh.
+func (p *Nord) SetIsRoot(b bool) {
+	p.isRoot = b
+}
+
 // GetRoot is duh.
 func (p *Nord) GetRoot() Norder {
 	if p.IsRoot() {
@@ -74,6 +80,11 @@ func (p *Nord) SeqId() int {
 	return p.seqId
 }
 
+// Level is duh.
+func (p *Nord) Level() int {
+	return p.level
+}
+
 // RelFP is a dummy.
 func (p *Nord) RelFP() string { return "" }
 
@@ -83,6 +94,11 @@ func (p *Nord) AbsFP() string { return "" }
 // Parent returns the parent, duh.
 func (p *Nord) Parent() Norder {
 	return p.parent
+}
+
+// Setlevel is duh.
+func (p *Nord) SetLevel(i int) {
+	p.level = i
 }
 
 // SetParent has no side effects.
@@ -120,6 +136,8 @@ func (p *Nord) AddKid(aKid Norder) Norder { // NOTE aKid was *Nord
 	}
 	var FK = p.firstKid
 	var LK = p.lastKid
+	// Set the level now
+	aKid.SetLevel(p.Level() + 1)
 	// Is the new kid an only kid ?
 	if FK == nil && LK == nil {
 		p.firstKid, p.lastKid = aKid, aKid
@@ -209,9 +227,9 @@ func (p *Nord) Echo() string {
 	panic("recursion") // return p.Echo()
 }
 
-// LinePrefix provides indentation and should start a line of display/debug.
+// LinePrefixString provides indentation and should start a line of display/debug.
 // It does not end the string with (white)space.
-func (p Nord) LinePrefix() string {
+func (p Nord) LinePrefixString() string {
 	if p.isRoot { // && p.Parent == nil
 		return "[R]"
 	} else if p.level == 0 && p.Parent != nil {
@@ -219,7 +237,7 @@ func (p Nord) LinePrefix() string {
 	} else {
 		// (spaces)[lvl:seq]"
 		// func S.Repeat(s string, count int) string
-		return fmt.Sprintf("%s[%d:%02s]",
+		return fmt.Sprintf("%s[%d:%02d]",
 			S.Repeat("  ", p.level-1), p.level, p.seqId)
 	}
 }
@@ -231,7 +249,7 @@ func yn(b bool) string {
 		return "n"
 	}
 }
-func (p Nord) LineSummary() string {
+func (p Nord) LineSummaryString() string {
 	var sb S.Builder
 	if p.IsRoot() {
 		sb.WriteString("ROOT ")
@@ -247,6 +265,27 @@ func (p Nord) LineSummary() string {
 	}
 	sb.WriteString(fmt.Sprintf("id:%d L%d", p.seqId, p.level))
 	return (sb.String())
+}
+
+var printAllTo io.Writer
+
+func (p *Nord) PrintAll(w io.Writer) error {
+	if w == nil {
+		return nil
+	}
+	printAllTo = w
+	e := WalkNorders(p, nvfPrintOneLiner)
+	if e != nil {
+		println("nvfPrintOneLiner ERR:", e.Error())
+		return e
+	}
+	return nil
+}
+
+func nvfPrintOneLiner(p Norder) error {
+	fmt.Fprintf(printAllTo, "%s %s \n",
+		p.LinePrefixString(), p.LineSummaryString())
+	return nil
 }
 
 /* String implements Markupper.

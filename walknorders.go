@@ -2,7 +2,7 @@ package orderednodes
 
 type NorderVisiterFunc func(pNode Norder) error
 
-func WalkNorderTree(p Norder, nvf NorderVisiterFunc) error {
+func WalkNorders(p Norder, nvf NorderVisiterFunc) error {
 	// println("on.walker: HANDLE SKIPDIR")
 	if err := nvf(p); err != nil {
 		return err
