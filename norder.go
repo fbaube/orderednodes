@@ -6,6 +6,7 @@ import (
 
 // Norder is satisfied by *Nord NOT by Nord
 type Norder interface {
+	// PUBLIC METHODS
 	SeqID() int
 	// SetSeqID(int)
 	Level() int
@@ -13,7 +14,7 @@ type Norder interface {
 	AbsFP() string
 	IsRoot() bool
 	GetRoot() Norder
-	SetIsRoot(bool)
+	// SetIsRoot(bool)
 	Parent() Norder
 	HasKids() bool
 	FirstKid() Norder
@@ -23,7 +24,6 @@ type Norder interface {
 	KidsAsSlice() []Norder
 	AddKid(Norder) Norder
 	ReplaceWith(Norder) Norder
-	SetLevel(int)
 	SetParent(Norder)
 	SetPrevKid(Norder)
 	SetNextKid(Norder)
@@ -32,6 +32,8 @@ type Norder interface {
 	LinePrefixString() string
 	LineSummaryString() string
 	GetLineSummaryFunc() StringFunc
-	SetLineSummaryFunc(StringFunc)
+	// SetLineSummaryFunc(StringFunc)
 	PrintAll(io.Writer) error
+	// PACKAGE METHODS
+	setLevel(int)
 }
