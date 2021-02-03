@@ -1,10 +1,13 @@
 package orderednodes
 
-import "io"
+import (
+	"io"
+)
 
 // Norder is satisfied by *Nord NOT by Nord
 type Norder interface {
-	SeqId() int
+	SeqID() int
+	// SetSeqID(int)
 	Level() int
 	RelFP() string
 	AbsFP() string
@@ -14,6 +17,7 @@ type Norder interface {
 	Parent() Norder
 	HasKids() bool
 	FirstKid() Norder
+	LastKid() Norder
 	PrevKid() Norder
 	NextKid() Norder
 	KidsAsSlice() []Norder
@@ -23,7 +27,11 @@ type Norder interface {
 	SetParent(Norder)
 	SetPrevKid(Norder)
 	SetNextKid(Norder)
+	SetFirstKid(Norder)
+	SetLastKid(Norder)
 	LinePrefixString() string
 	LineSummaryString() string
+	GetLineSummaryFunc() StringFunc
+	SetLineSummaryFunc(StringFunc)
 	PrintAll(io.Writer) error
 }

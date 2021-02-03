@@ -3,14 +3,14 @@ package orderednodes
 type NorderVisiterFunc func(pNode Norder) error
 
 func WalkNorders(p Norder, nvf NorderVisiterFunc) error {
-	// println("on.walker: HANDLE SKIPDIR")
-	if err := nvf(p); err != nil {
-		return err
+	var e error
+	if e = nvf(p); e != nil {
+		return e
 	}
 	pKid := p.FirstKid()
 	for pKid != nil {
-		if err := nvf(pKid); err != nil {
-			return err
+		if e = WalkNorders(pKid, nvf); e != nil {
+			return e
 		}
 		pKid = pKid.NextKid()
 	}

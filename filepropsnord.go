@@ -25,35 +25,27 @@ type RootFilePropsNord FilePropsNord
 
 // type OPPNoder interface { }
 
-// AbsFP is duh.
-func (p *FilePropsNord) AbsFP() string {
-	return p.PathProps.AbsFP()
-}
-
-// RelFP is duh.
-func (p *FilePropsNord) RelFP() string {
-	return p.PathProps.RelFP()
-}
-
-// type WalkONoderFunc func(pNode ONoder) error
-// func WalkONoders(p ONoder, wfn WalkONoderFunc) error {
-
 var pathToBeFound string
 var pathIsFound Norder
 
+/*
 func (p *FilePropsNord) FirstKid() Norder {
-	var pp *Nord
-	// var ok bool
-	pp = &(p.Nord)
-	pp, _ = pp.FirstKid().(*Nord)
-	var ppp Norder
-	var pppp *FilePropsNord
-	ppp = pp
-	pppp, _ = ppp.(*FilePropsNord)
-	return pppp
-	// return p.FirstKid().(*pOPPNode)
+	/*
+		var pp *Nord
+		// var ok bool
+		pp = &(p.Nord)
+		pp, _ = pp.FirstKid().(*Nord)
+		var ppp Norder
+		var pppp *FilePropsNord
+		ppp = pp
+		pppp, _ = ppp.(*FilePropsNord)
+		return pppp
+	* /
+	return p.FirstKid()
 }
+*/
 
+/*
 func (pRoot *FilePropsNord) FindONoderByPath(path string) Norder {
 	println("FindNorderByPath:", path)
 	pathToBeFound = path
@@ -79,3 +71,4 @@ func nvfFindPath(p Norder) error {
 	}
 	return nil
 }
+*/
