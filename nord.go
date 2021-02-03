@@ -134,11 +134,6 @@ func (p *Nord) IsRoot() bool {
 	return p.isRoot
 }
 
-// SetIsRoot is duh.
-func (p *Nord) SetIsRoot(b bool) {
-	p.isRoot = b
-}
-
 // GetRoot is duh.
 func (p *Nord) GetRoot() Norder {
 	if p.IsRoot() {
@@ -150,11 +145,6 @@ func (p *Nord) GetRoot() Norder {
 		ondr = ondr.Parent()
 	}
 	return ondr
-}
-
-// HasKids is duh.
-func (p *Nord) HasKids() bool {
-	return p.firstKid != nil && p.lastKid != nil
 }
 
 // SeqId is duh.
@@ -176,234 +166,9 @@ func (p *Nord) RelFP() string { return p.path }
 // AbsFP is not valid until set by the embedding struct.
 func (p *Nord) AbsFP() string { return string(p.absPath) }
 
-// Parent returns the parent, duh.
-func (p *Nord) Parent() Norder {
-	return p.parent
-}
-
-/*
-// SetSeqId is duh.
-func (p *Nord) SetSeqId(i int) {
-	p.seqId = i
-}
-*/
-
-// Setlevel is duh.
-func (p *Nord) SetLevel(i int) {
+// setlevel is duh.
+func (p *Nord) setLevel(i int) {
 	p.level = i
-}
-
-// SetParent has no side effects.
-func (p *Nord) SetParent(p2 Norder) {
-	p.parent = p2
-}
-
-// SetPrevKid has no side effects.
-func (p *Nord) SetPrevKid(p2 Norder) {
-	p.prevKid = p2
-}
-
-// SetNextKid has no side effects.
-func (p *Nord) SetNextKid(p2 Norder) {
-	p.nextKid = p2
-}
-
-// SetFirstKid has no side effects.
-func (p *Nord) SetFirstKid(p2 Norder) {
-	p.firstKid = p2
-}
-
-// SetLastKid has no side effects.
-func (p *Nord) SetLastKid(p2 Norder) {
-	p.lastKid = p2
-}
-
-/*
-// SetParent has no side effects.
-func (p *ONode) SetParent(p2 ONoder) {
-	p.parent = p2
-}
-*/
-
-// AddKid adds the supplied node as the last kid, and returns
-// it (i.e. the new last kid), now linked into the tree.
-func (p *Nord) AddKid(aKid Norder) Norder { // returns aKid
-	// fmt.Printf("nord: ptrs? aKid<%T> p<%T> \n", aKid, p)
-	if aKid.PrevKid() != nil || aKid.NextKid() != nil {
-		fmt.Fprintf(os.Stdout, "FATAL in AddKid: Tag<< %+v >> kid<< %+v >>\n", p, aKid)
-		panic("AddKid(K) can't cos K has siblings")
-	}
-	if aKid.Parent() != nil && aKid.Parent() != p {
-		fmt.Fprintf(os.Stdout, "FATAL in AddKid: Tag<< %+v >> kid<< %+v >>\n", p, aKid)
-		panic("E.AddKid(K) can't cos K has non-P parent")
-	}
-	var FK = p.firstKid
-	var LK = p.lastKid
-	// Set the level now
-	aKid.SetLevel(p.Level() + 1)
-	// Is the new kid an only kid ?
-	if FK == nil && LK == nil {
-		p.firstKid, p.lastKid = aKid, aKid
-		aKid.SetParent(p)
-		aKid.SetPrevKid(nil)
-		aKid.SetNextKid(nil)
-		/*
-			if aKid.Parent() != p {
-				panic("BAD PARENT 1")
-			}
-			println("OK PARENT 1")
-		*/
-		return aKid
-	}
-	if !(FK != nil && LK != nil) {
-		panic("BAD KID LINKS")
-	}
-	// So, replace the last kid
-	if LK != nil {
-		if LK.Parent() != p {
-			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", p, aKid)
-			panic("E.AddKid: E's last kid dusnt know E")
-		}
-		if LK.NextKid() != nil {
-			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", p, aKid)
-			panic("E.AddKid: E's last kid has a next kid")
-		}
-		LK.SetNextKid(aKid) // LK.nextKid = aKid
-		aKid.SetPrevKid(LK) // aKid.prevKid = LK
-		p.lastKid = aKid
-		aKid.SetParent(p)
-		/*
-			if aKid.Parent() != p {
-				panic("BAD PARENT 2")
-			}
-			println("OK PARENT 2")
-		*/
-		return aKid
-	}
-	fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", p, aKid)
-	panic("AddKid: Chaos!")
-}
-
-// AddKid adds the supplied node as the last kid, and returns
-// it (i.e. the new last kid), now linked into the tree.
-func AddKid2(par, kid Norder) { // Norder { // returns aKid
-	// fmt.Printf("nord: ptrs? par<%T> kid<%T> \n", par, kid)
-	if kid.PrevKid() != nil || kid.NextKid() != nil {
-		fmt.Fprintf(os.Stdout, "FATAL in AddKid: Tag<< %+v >> kid<< %+v >>\n", par, kid)
-		panic("AddKid(K) can't cos K has siblings")
-	}
-	if kid.Parent() != nil && kid.Parent() != par {
-		fmt.Fprintf(os.Stdout, "FATAL in AddKid: Tag<< %+v >> kid<< %+v >>\n", par, kid)
-		panic("E.AddKid(K) can't cos K has non-P parent")
-	}
-	var FK = par.FirstKid()
-	var LK = par.LastKid()
-	// Set the level now
-	kid.SetLevel(par.Level() + 1)
-	// Is the new kid an only kid ?
-	if FK == nil && LK == nil {
-		par.SetFirstKid(kid)
-		par.SetLastKid(kid)
-		kid.SetParent(par)
-		kid.SetPrevKid(nil)
-		kid.SetNextKid(nil)
-		/*
-			if kid.Parent() != par {
-				panic("BAD PARENT 1")
-			}
-			println("OK PARENT 1")
-		*/
-		return
-	}
-	if !(FK != nil && LK != nil) {
-		panic("BAD KID LINKS")
-	}
-	// So, replace the last kid
-	if LK != nil {
-		if LK.Parent() != par {
-			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", par, kid)
-			panic("E.AddKid: E's last kid dusnt know E")
-		}
-		if LK.NextKid() != nil {
-			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", par, kid)
-			panic("E.AddKid: E's last kid has a next kid")
-		}
-		LK.SetNextKid(kid) // LK.nextKid = aKid
-		kid.SetPrevKid(LK) // aKid.prevKid = LK
-		par.SetLastKid(kid)
-		kid.SetParent(par)
-		/*
-			if kid.Parent() != par {
-				panic("BAD PARENT 2")
-			}
-			println("OK PARENT 2")
-		*/
-		return
-	}
-	fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", par, kid)
-	panic("AddKid: Chaos!")
-}
-
-// ===
-
-// AddKid adds the supplied node as the last kid, and returns
-// it (i.e. the new last kid), now linked into the tree.
-func AddKid3(par, kid *Nord) { // Norder { // returns aKid
-	// fmt.Printf("nord: ptrs? par<%T> kid<%T> \n", par, kid)
-	if kid.PrevKid() != nil || kid.NextKid() != nil {
-		fmt.Fprintf(os.Stdout, "FATAL in AddKid: Tag<< %+v >> kid<< %+v >>\n", par, kid)
-		panic("AddKid(K) can't cos K has siblings")
-	}
-	if kid.Parent() != nil && kid.Parent() != par {
-		fmt.Fprintf(os.Stdout, "FATAL in AddKid: Tag<< %+v >> kid<< %+v >>\n", par, kid)
-		panic("E.AddKid(K) can't cos K has non-P parent")
-	}
-	var FK = par.firstKid
-	var LK = par.lastKid
-	// Set the level now
-	kid.SetLevel(par.Level() + 1)
-	// Is the new kid an only kid ?
-	if FK == nil && LK == nil {
-		par.firstKid = kid
-		par.lastKid = kid
-		kid.parent = par
-		kid.prevKid = nil
-		kid.nextKid = nil
-		/*
-			if kid.Parent() != par {
-				panic("BAD PARENT 1")
-			}
-			println("OK PARENT 1")
-		*/
-		return
-	}
-	if !(FK != nil && LK != nil) {
-		panic("BAD KID LINKS")
-	}
-	// So, replace the last kid
-	if LK != nil {
-		if LK.Parent() != par {
-			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", par, kid)
-			panic("E.AddKid: E's last kid dusnt know E")
-		}
-		if LK.NextKid() != nil {
-			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", par, kid)
-			panic("E.AddKid: E's last kid has a next kid")
-		}
-		LK.SetNextKid(kid) // LK.nextKid = aKid
-		kid.prevKid = LK   // aKid.prevKid = LK
-		par.lastKid = kid
-		kid.parent = par
-		/*
-			if kid.Parent() != par {
-				panic("BAD PARENT 2")
-			}
-			println("OK PARENT 2")
-		*/
-		return
-	}
-	fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", par, kid)
-	panic("AddKid: Chaos!")
 }
 
 // AddKid adds the supplied node as the last kid, and returns
@@ -445,26 +210,6 @@ func (pOld *Nord) ReplaceWith(pNew Norder) Norder {
 	// REPLACE PARENT'S KID-LINK
 
 	return pNew
-}
-
-// FirstKid provides read-only access for other packages. Can return nil.
-func (p *Nord) FirstKid() Norder {
-	return p.firstKid
-}
-
-// LastKid provides read-only access for other packages. Can return nil.
-func (p *Nord) LastKid() Norder {
-	return p.lastKid
-}
-
-// PrevKid provides read-only access for other packages. Can return nil.
-func (p *Nord) PrevKid() Norder {
-	return p.prevKid
-}
-
-// NextKid provides read-only access for other packages. Can return nil.
-func (p *Nord) NextKid() Norder {
-	return p.nextKid
 }
 
 // Echo implements Markupper.
@@ -546,23 +291,4 @@ func nvfPrintOneLiner(p Norder) error {
 	fmt.Fprintf(printAllTo, "%s %s \n",
 		p.LinePrefixString(), p.LineSummaryString())
 	return nil
-}
-
-/* String implements Markupper.
-func (p ONode) String() string {
-	var s = p.Echo() +
-		// fmt.Sprintf(" [d%d:%d] ", p.Depth, p.MatchingTagsIndex) +
-		fmt.Sprintf(" [%d] ", p.level) + p.TagSummary.String()
-	return s
-}
-*/
-
-func (p *Nord) KidsAsSlice() []Norder {
-	var pp []Norder
-	c := p.FirstKid() // p.firstKid
-	for c != nil {
-		pp = append(pp, c)
-		c = c.NextKid() // c.nextKid
-	}
-	return pp
 }
