@@ -76,13 +76,16 @@ type Nord struct {
 	lineSummaryFunc    StringFunc
 }
 
-type nordCreationState struct {
+// RootNord is available to make explicit assignments to/from root node.
+type RootNord Nord
+
+type norderCreationState struct {
 	nexSeqID      int // reset to 0 when doing another tree ?
 	rootPath      string
 	summaryString StringFunc
 }
 
-var pNCS *nordCreationState = new(nordCreationState)
+var pNCS *norderCreationState = new(norderCreationState)
 
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p := new(Nord)
@@ -125,9 +128,6 @@ func (p *Nord) GetLineSummaryFunc() StringFunc {
 func (p *Nord) SetLineSummaryFunc(sf StringFunc) {
 	p.lineSummaryFunc = sf
 }
-
-// RootNord is available to make explicit assignments to/from root node.
-type RootNord Nord
 
 // IsRoot is duh.
 func (p *Nord) IsRoot() bool {
@@ -271,6 +271,7 @@ func (p *Nord) LineSummaryString() string {
 var printAllTo io.Writer
 
 func (p *Nord) PrintAll(w io.Writer) error {
+	println("PrintAll: could use printer fn")
 	if w == nil {
 		return nil
 	}
