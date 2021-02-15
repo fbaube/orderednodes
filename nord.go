@@ -273,7 +273,7 @@ var printAllTo io.Writer
 func (p *Nord) PrintAll(w io.Writer) error {
 	println("PrintAll: could use printer fn")
 	if w == nil {
-		return nil
+		return nil 
 	}
 	printAllTo = w
 	e := WalkNorders(p, nvfPrintOneLiner)
