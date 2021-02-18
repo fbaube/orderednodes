@@ -74,6 +74,7 @@ type Nord struct {
 	// The bracketing by commas makes searching simpler.
 	parSeqID, kidSeqID string
 	lineSummaryFunc    StringFunc
+	isDir              bool
 }
 
 // RootNord is available to make explicit assignments to/from root node.
@@ -86,6 +87,12 @@ type norderCreationState struct {
 }
 
 var pNCS *norderCreationState = new(norderCreationState)
+
+// IsDir does NOT work, because we are not setting bool isDir yet.
+// It is set (or not set) in embedding structs.
+func (p *Nord) IsDir() bool {
+	return p.isDir
+}
 
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p := new(Nord)
@@ -103,6 +110,7 @@ func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p.absPath = FU.AbsFP(FP.Clean(rootPath))
 	p.isRoot = true
 	pNCS.summaryString = smryFunc
+	// p.isDir =
 	println("newRootNord:", p.absPath)
 	return p
 }
@@ -118,6 +126,7 @@ func NewNord(aPath string) *Nord {
 	p.path = aPath
 	p.absPath = FU.AbsFP(FP.Join(pNCS.rootPath, aPath))
 	p.lineSummaryFunc = pNCS.summaryString
+	// p.isDir =
 	return p
 }
 
@@ -273,7 +282,7 @@ var printAllTo io.Writer
 func (p *Nord) PrintAll(w io.Writer) error {
 	println("PrintAll: could use printer fn")
 	if w == nil {
-		return nil 
+		return nil
 	}
 	printAllTo = w
 	e := WalkNorders(p, nvfPrintOneLiner)

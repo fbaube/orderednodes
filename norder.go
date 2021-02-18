@@ -14,6 +14,7 @@ type Norder interface {
 	AbsFP() string
 	IsRoot() bool
 	GetRoot() Norder
+	IsDir() bool
 	// SetIsRoot(bool)
 	Parent() Norder
 	HasKids() bool
