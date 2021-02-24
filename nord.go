@@ -280,7 +280,7 @@ func (p *Nord) LineSummaryString() string {
 var printAllTo io.Writer
 
 func (p *Nord) PrintAll(w io.Writer) error {
-	println("PrintAll: could use printer fn")
+	// println("PrintAll: could use printer fn")
 	if w == nil {
 		return nil
 	}
