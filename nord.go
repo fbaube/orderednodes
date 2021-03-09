@@ -111,7 +111,7 @@ func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p.isRoot = true
 	pNCS.summaryString = smryFunc
 	// p.isDir =
-	println("newRootNord:", p.absPath)
+	// println("newRootNord:", p.absPath)
 	return p
 }
 
