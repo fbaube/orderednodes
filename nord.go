@@ -279,6 +279,15 @@ func (p *Nord) LineSummaryString() string {
 
 var printAllTo io.Writer
 
+func init() {
+	f, e := os.Open("./contentity-tree")
+	if e == nil {
+		printAllTo = f
+	} else {
+		println("contentity-tree:", e.Error())
+	}
+}
+
 func (p *Nord) PrintAll(w io.Writer) error {
 	// println("PrintAll: could use printer fn")
 	if w == nil {
