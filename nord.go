@@ -280,7 +280,7 @@ func (p *Nord) LineSummaryString() string {
 var printAllTo io.Writer
 
 func init() {
-	f, e := os.Open("./contentity-tree")
+	f, e := os.Create("./contentity-tree")
 	if e == nil {
 		printAllTo = f
 	} else {
