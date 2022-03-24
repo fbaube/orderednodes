@@ -2,6 +2,7 @@ package orderednodes
 
 import (
 	"fmt"
+	L "github.com/fbaube/mlog"
 	"io"
 	"os"
 	FP "path/filepath"
@@ -81,7 +82,10 @@ type Nord struct {
 type RootNord Nord
 
 type norderCreationState struct {
-	nexSeqID      int // reset to 0 when doing another tree ?
+	// nexSeqID should be reset to 0 when starting another tree ?
+	// No, because every single entity (dir/file) gets one,
+	// even if it is listed on the CLI as an individual file.
+	nexSeqID      int
 	rootPath      string
 	summaryString StringFunc
 }
@@ -97,14 +101,18 @@ func (p *Nord) IsDir() bool {
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p := new(Nord)
 	// p.lineSummaryFunc = NordSummaryString // func
-	if pNCS.nexSeqID != 0 {
-		println("newRootNord: seqID is not zero")
-	}
+	/*
+		if pNCS.nexSeqID != 0 {
+			L.L.Warning("newRootNord: seqID was not zero (was %d)", pNCS.nexSeqID)
+			pNCS.nexSeqID = 0
+		}
+	*/
 	if rootPath == "" {
-		println("newRootNord: missing root path")
+		L.L.Warning("newRootNord: missing root path")
 	}
 	p.seqID = pNCS.nexSeqID
 	pNCS.nexSeqID += 1
+	// L.L.Dbg("newRootNord: seqID is now %d", pNCS.nexSeqID)
 	p.path = "."
 	// This next stmt assumes *files* not DOM
 	p.absPath = FU.AbsFP(FP.Clean(rootPath))
@@ -123,6 +131,7 @@ func NewNord(aPath string) *Nord {
 	// p.lineSummaryFunc = NordSummaryString // func
 	p.seqID = pNCS.nexSeqID
 	pNCS.nexSeqID += 1
+	// L.L.Dbg("NewNord: seqID is now %d", pNCS.nexSeqID)
 	p.path = aPath
 	p.absPath = FU.AbsFP(FP.Join(pNCS.rootPath, aPath))
 	p.lineSummaryFunc = pNCS.summaryString
