@@ -44,7 +44,6 @@ type StringFunc func(Norder) string
 // for example in a slice, it is not feasible to define a simpler variant of
 // Node (with unordered kids) that could then be embedded in Nord. Nor is it
 // simple to get a kid count.
-//
 type Nord struct {
 	// Path is the relative path of this Nord. The last element
 	// of the Path is this Nord's own label, i.e. FP.Base(Path)
@@ -297,21 +296,21 @@ func init() {
 	}
 }
 
-func (p *Nord) PrintAll(w io.Writer) error {
-	// println("PrintAll: could use printer fn")
+func (p *Nord) PrintTree(w io.Writer) error {
+	// println("PrintTree: could use printer fn")
 	if w == nil {
 		return nil
 	}
 	printAllTo = w
-	e := WalkNorders(p, nvfPrintOneLiner)
+	e := InspectTree(p, nordPrintOneLiner)
 	if e != nil {
-		println("nvfPrintOneLiner ERR:", e.Error())
+		println("nordPrintOneLiner ERR:", e.Error())
 		return e
 	}
 	return nil
 }
 
-func nvfPrintOneLiner(p Norder) error {
+func nordPrintOneLiner(p Norder) error {
 	// var F StringFunc
 	// F = p.GetLineSummaryFunc()
 	// fmt.Fprintf(printAllTo, "%s %s (%T) \n", p.LinePrefixString(), F(p), p)

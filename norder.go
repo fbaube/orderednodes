@@ -34,7 +34,7 @@ type Norder interface {
 	LineSummaryString() string
 	GetLineSummaryFunc() StringFunc
 	// SetLineSummaryFunc(StringFunc)
-	PrintAll(io.Writer) error
+	PrintTree(io.Writer) error
 	// PACKAGE METHODS
 	setLevel(int)
 }
