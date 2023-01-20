@@ -18,3 +18,26 @@ func InspectTree(p Norder, f InspectorFunc) error {
 	}
 	return nil
 }
+
+func InspectTreeWithPreAndPost(p Norder,
+	f0 InspectorFunc, f1 InspectorFunc) error {
+
+	var e error
+	// PRE
+	if e = f0(p); e != nil {
+		return e
+	}
+	// KIDS
+	pKid := p.FirstKid()
+	for pKid != nil {
+		if e = InspectTreeWithPreAndPost(pKid, f0, f1); e != nil {
+			return e
+		}
+		pKid = pKid.NextKid()
+	}
+	// POST
+	if e = f1(p); e != nil {
+		return e
+	}
+	return nil
+}

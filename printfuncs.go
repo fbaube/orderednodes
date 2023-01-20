@@ -101,7 +101,8 @@ func (p *Nord) PrintCssTree(w io.Writer) error {
 		return nil
 	}
 	printTreeTo = w
-	e := InspectTree(p, nordPrintCssOneLiner)
+	e := InspectTreeWithPreAndPost(p,
+		nordPrintCssOneLinerPre, nordPrintCssOneLinerPost)
 	if e != nil {
 		println("nordPrintCssLine ret'd ERR:", e.Error())
 		return e
@@ -118,11 +119,34 @@ func nordPrintOneLiner(p Norder) error {
 	return nil
 }
 
-func nordPrintCssOneLiner(p Norder) error {
+func nordPrintCssOneLinerPre(p Norder) error {
+	// firstEntry := true
+	smry := p.LineSummaryString()
+
 	if p.IsDir() {
+		// if firstEntry {
+		//  } else {
+		// <li><details><summary><i>Ice</i> giants</summary>
+		// <ul>
+		fmt.Fprintf(printTreeTo, "<li><details><summary>"+
+			smry+"</summary>\nul")
+		// }
 	} else {
+		// Do both Pre AND Post
+		fmt.Fprintf(printTreeTo, "<li>"+smry+"</li>\n")
 	}
 	fmt.Fprintf(printTreeTo, p.LineSummaryString())
+	// firstEntry = false
+	return nil
+}
 
+func nordPrintCssOneLinerPost(p Norder) error {
+	if p.IsDir() {
+		fmt.Fprintf(printTreeTo, "</li>\n")
+	} /* else {
+		// Do both Pre AND Post
+		fmt.Fprintf(printTreeTo, "<li>"+smry+"</li>\n")
+	} */
+	fmt.Fprintf(printTreeTo, p.LineSummaryString())
 	return nil
 }
