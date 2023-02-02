@@ -3,12 +3,13 @@ package orderednodes
 import (
 	"fmt"
 	"io"
-	"os"
+	// "os"
 	S "strings"
 )
 
 var printTreeTo, printCssTreeTo io.Writer
 
+/*
 func init() {
 	f, e := os.Create("./contentity-tree")
 	if e == nil {
@@ -16,13 +17,8 @@ func init() {
 	} else {
 		println("contentity-tree:", e.Error())
 	}
-	f, e = os.Create("./css-tree")
-	if e == nil {
-		printCssTreeTo = f
-	} else {
-		println("css-tree:", e.Error())
-	}
 }
+1;95;0c*/
 
 // Echo implements Markupper.
 func (p *Nord) Echo() string {
