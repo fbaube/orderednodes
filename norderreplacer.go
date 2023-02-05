@@ -20,8 +20,6 @@ func ReplaceTree(oldRoot Norder, f ReplacerFunc) (newRoot Norder, err error) { /
 	return nil, nil
 }
 
-/*
-func UpgradeNordToFilePropsNord(inNord Norder) Norder {
-	return nil
-}
-*/
+// func UpgradeNordToFilePropsNord(inNord Norder) Norder {
+//	return nil
+// }

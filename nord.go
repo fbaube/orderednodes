@@ -98,12 +98,11 @@ func (p *Nord) IsDir() bool {
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p := new(Nord)
 	// p.lineSummaryFunc = NordSummaryString // func
-	/*
-		if pNCS.nexSeqID != 0 {
-			L.L.Warning("newRootNord: seqID was not zero (was %d)", pNCS.nexSeqID)
-			pNCS.nexSeqID = 0
-		}
-	*/
+
+	// if pNCS.nexSeqID != 0 {
+	// L.L.Warning("newRootNord: seqID was not zero (was %d)", pNCS.nexSeqID)
+	// pNCS.nexSeqID = 0
+	// }
 	if rootPath == "" {
 		L.L.Warning("newRootNord: missing root path")
 	}

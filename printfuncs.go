@@ -9,17 +9,6 @@ import (
 
 var printTreeTo, printCssTreeTo io.Writer
 
-/*
-func init() {
-	f, e := os.Create("./contentity-tree")
-	if e == nil {
-		printTreeTo = f
-	} else {
-		println("contentity-tree:", e.Error())
-	}
-}
-1;95;0c*/
-
 // Echo implements Markupper.
 func (p *Nord) Echo() string {
 	panic("recursion") // return p.Echo()
@@ -56,19 +45,11 @@ func (p *Nord) LineSummaryString() string {
 	if p.IsRoot() {
 		sb.WriteString("ROOT ")
 	}
-	/*
-		if p.PrevKid() != nil {
-			sb.WriteString("P ")
-		}
-		if p.Parent() == nil {
-			sb.WriteString("NOPARENT ")
-		}
-		if p.NextKid() != nil {
-			sb.WriteString("N ")
-		}
-		if p.HasKids() {
-			sb.WriteString("kid(s) ")
-		}
+	/* more debugging
+	if p.PrevKid() != nil {	sb.WriteString("P ") }
+	if p.Parent() == nil {	sb.WriteString("NOPARENT ") }
+	if p.NextKid() != nil { sb.WriteString("N ") }
+	if p.HasKids() { sb.WriteString("kid(s) ") }
 	*/
 	if p.path == "" {
 		sb.WriteString("NOPATH")
@@ -139,10 +120,10 @@ func nordPrintCssOneLinerPre(p Norder) error {
 func nordPrintCssOneLinerPost(p Norder) error {
 	if p.IsDir() {
 		fmt.Fprintf(printTreeTo, "</li>\n")
-	} /* else {
-		// Do both Pre AND Post
-		fmt.Fprintf(printTreeTo, "<li>"+smry+"</li>\n")
-	} */
+	} // else {
+	// Do both Pre AND Post
+	// fmt.Fprintf(printTreeTo, "<li>"+smry+"</li>\n")
+	// }
 	fmt.Fprintf(printTreeTo, p.LineSummaryString())
 	return nil
 }
