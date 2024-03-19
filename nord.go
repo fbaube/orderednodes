@@ -18,6 +18,13 @@ type StringFunc func(Norder) string
 // NOTE: Ignore https://godoc.org/golang.org/x/net/html#Node
 // (and many other available implementations of "Node" data structure).
 
+// NOTE: Compared to usage for XML, usage for files & dirs is much more
+// strictly typed. Dirs are dirs and files are files and never the twain
+// shalll meet. This means that dirs can never contain content and that
+// files can never be non-leaf nodes. However this kind of typing is too
+// complex to handle here in an OrderedNode, so it is handled instead by
+// (for example) an instance of fileutils.PathProps. 
+//
 // Nord is a Node but with ordered children nodes: the child nodes have a
 // specific specified order. It lets us define such funcs as FirstKid(),
 // NextKid(), PrevKid(), LastKid(). They are defined in interface Norder.
@@ -43,8 +50,9 @@ type StringFunc func(Norder) string
 // Node (with unordered kids) that could then be embedded in Nord. Nor is it
 // simple to get a kid count.
 type Nord struct {
-	// Path is the relative path of this Nord. The last element
-	// of the Path is this Nord's own label, i.e. FP.Base(Path)
+	// Path is the relative path of this Nord, relative to some
+	// "local root" shared with its peers. The last element of
+	// the Path is this Nord's own label, i.e. FP.Base(Path).
 	path string // relFP
 	// absPath is the same as path, but rooted in the root node's path.
 	// For a file, it is rooted at the filesystem root.

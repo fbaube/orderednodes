@@ -7,8 +7,9 @@ import (
 // Ignore https://godoc.org/golang.org/x/net/html#Node
 
 // FilePropsNord is an Ordered Propertied Path node:
-// NOT ONLY the child nodes have a specific specified order
-// BUT ALSO each node has a filepath plus the file properties.
+// NOT ONLY the child nodes have a specific specified
+// order BUT ALSO each node has a filepath plus the
+// file item itself including its contents (in TypedRaw).
 // This means Pthat every Parent node is a directory.
 //
 // It also means we can use the redundancy to do a lot of error checking.
@@ -17,7 +18,7 @@ import (
 //
 type FilePropsNord struct {
 	Nord
-	FU.PathProps
+	FU.FSItem
 }
 
 // Available to ensure that assignments to/from root node are explicit.
