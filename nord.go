@@ -23,12 +23,12 @@ type StringFunc func(Norder) string
 // shalll meet. This means that dirs can never contain content and that
 // files can never be non-leaf nodes. However this kind of typing is too
 // complex to handle here in an OrderedNode, so it is handled instead by
-// (for example) an instance of fileutils.PathProps. 
+// (for example) an instance of [fileutils.FSItem]. 
 //
-// Nord is a Node but with ordered children nodes: the child nodes have a
-// specific specified order. It lets us define such funcs as FirstKid(),
+// Nord is a Node but with ordered children nodes: the child nodes have 
+// a specific specified order. It lets us define such funcs as FirstKid(),
 // NextKid(), PrevKid(), LastKid(). They are defined in interface Norder.
-// A Nord also contains its own relative and absolute paths.
+// A Nord also contains its own relative (to its inbatch) and absolute paths.
 //
 // There are three use cases identified for Nords: files & directories, DOM
 // markup, and [Lw]DITA map files. Note that we never have two identically
@@ -37,41 +37,49 @@ type StringFunc func(Norder) string
 // to Nords will fail unless the tags are made unique with subscript indices,
 // such as "[1]", "[2]", like those used in (for example) JQuery.
 //
-// If we build up a tree of Nords when processing an os.DirFS, the strict
-// ordering provided by DirFS is not strictly needed, BUT it can anyways
-// be used (and relied upon) because io.fs.WalkDir is deterministic (using
+// If we build up a tree of Nords when processing an [os.DirFS], the strict
+// ordering provided by DirFS is not strictly needed, BUT it can anyways be
+// used (and relied upon) because [io.fs.WalkDir] is deterministic (using
 // lexical order). It means that a given Nord will always appear AFTER the
 // Nord for its directory has appeared, which makes it much easier to build
 // a tree.
+//
+// Fields are lower-cased so that other packages cannot disrupt links. 
 //
 // *Implementation note:* We use a doubly-linked list, not a slice.
 // Since a Nord does not store a complete set of pointers to all of its kids,
 // for example in a slice, it is not feasible to define a simpler variant of
 // Node (with unordered kids) that could then be embedded in Nord. Nor is it
 // simple to get a kid count.
+// .
 type Nord struct {
-	// Path is the relative path of this Nord, relative to some
-	// "local root" shared with its peers. The last element of
-	// the Path is this Nord's own label, i.e. FP.Base(Path).
+	// Path is the relative path of this Nord, relative to the root
+	// Nord, which is the "local root" shared with its peers. (For
+	// example: the root of a directory tree imported in a single
+	// batch.) The last element of the Path is this Nord's own
+	// label, i.e. FP.Base(Path).
 	path string // relFP
-	// absPath is the same as path, but rooted in the root node's path.
+	// absPath is the same as path, but rooted in - and in a 
+	// dir tree, incorporating - the root node's absolute path.
 	// For a file, it is rooted at the filesystem root.
 	// For markup, it is rooted at the beginning of the document.
 	absPath FU.AbsFilePath
 
 	parent            Norder // level up
 	firstKid, lastKid Norder // level down
-	prevKid, nextKid  Norder // level same
+	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?) 
 	isRoot            bool   // level topmost
-	// level is equivalent to the number of "/" filepath seperators.
-	// Therefore it is 0 for root node (where IsRoot() is true and Parent()
-	// is nil), 0 for top-level files & directories, and >0 for others.
-	// Reserve negative numbers for future (ab)use.
+	// level is equal to the number of "/" filepath separators
+	// separating path elements (i.e. not including any trailing
+	// separator). Therefore it is 0 for XML root node (where
+	// IsRoot() is true and Parent() is nil), 0 for top-level
+	// files & directories, and >0 for others. Reserve negative
+	// numbers for future (ab)use.
 	level int
-	// seqID is a unique ID under this node's tree's root. It does not need
-	// to be the same as (say) the index of this Nord in a slice of Nord's,
-	// but it probably is. Its use is optional, and also it can be used in
-	// other ways in structs that embed Nord.
+	// seqID is a unique ID under this node's tree's root. It does not 
+	// need to be the same as (say) the index of this Nord in a slice 
+	// of Nord's, but it probably is. Its use is optional, and also 
+	// it can be used in other ways in structs that embed Nord.
 	seqID int
 	// parSeqID and kidSeqID's can add a layer of error checking and
 	// simplified access. Their use is optional.
@@ -83,19 +91,9 @@ type Nord struct {
 	isDir              bool
 }
 
-// RootNord is available to make explicit assignments to/from root node.
+// RootNord is defined so as to require 
+// explicit assignments to/from a root node.
 type RootNord Nord
-
-type norderCreationState struct {
-	// nexSeqID should be reset to 0 when starting another tree ?
-	// No, because every single entity (dir/file) gets one,
-	// even if it is listed on the CLI as an individual file.
-	nexSeqID      int
-	rootPath      string
-	summaryString StringFunc
-}
-
-var pNCS *norderCreationState = new(norderCreationState)
 
 // IsDir does NOT work, because we are not setting bool isDir yet.
 // It is set (or not set) in embedding structs.
@@ -103,42 +101,47 @@ func (p *Nord) IsDir() bool {
 	return p.isDir
 }
 
+// NewRootNord verified directoryness and
+// then sets the bools [isRoot] and [isDir].
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	p := new(Nord)
 	// p.lineSummaryFunc = NordSummaryString // func
-
-	// if pNCS.nexSeqID != 0 {
-	// L.L.Warning("newRootNord: seqID was not zero (was %d)", pNCS.nexSeqID)
-	// pNCS.nexSeqID = 0
-	// }
+	L.L.Info("NewRootNord: starting seqID: %d", NordEng.nexSeqID)
 	if rootPath == "" {
-		L.L.Warning("newRootNord: missing root path")
+		L.L.Error("NewRootNord: missing root path")
+		return nil 
 	}
-	p.seqID = pNCS.nexSeqID
-	pNCS.nexSeqID += 1
-	// L.L.Dbg("newRootNord: seqID is now %d", pNCS.nexSeqID)
+	p.seqID = NordEng.nexSeqID
+	NordEng.nexSeqID += 1
 	p.path = "."
-	// This next stmt assumes *files* not DOM
+	// NOTE thenext stmt assumes *files* not DOM
 	p.absPath = FU.AbsFP(FP.Clean(rootPath))
+	// Verify that it is in fact a directory
+	fm := FU.NewFileMeta(p.absPath.S())
+	if !fm.IsDir() {
+		L.L.Error("NewRootNord: path is not a dir: " + p.absPath.S())
+		return nil
+	}
 	p.isRoot = true
-	pNCS.summaryString = smryFunc
-	// p.isDir =
-	// println("newRootNord:", p.absPath)
+	p.isDir = true 
+	NordEng.summaryString = smryFunc
 	return p
 }
 
+// NewNord does not set (or unset) the bool [isDir] because checking 
+// it is an expensive operation that can and should be done elsewhere. 
 func NewNord(aPath string) *Nord {
 	if aPath == "" {
 		println("newNord: missing path")
 	}
 	p := new(Nord)
 	// p.lineSummaryFunc = NordSummaryString // func
-	p.seqID = pNCS.nexSeqID
-	pNCS.nexSeqID += 1
-	// L.L.Dbg("NewNord: seqID is now %d", pNCS.nexSeqID)
+	p.seqID = NordEng.nexSeqID
+	NordEng.nexSeqID += 1
+	// L.L.Dbg("NewNord: seqID is now %d", NordEng.nexSeqID)
 	p.path = aPath
-	p.absPath = FU.AbsFP(FP.Join(pNCS.rootPath, aPath))
-	p.lineSummaryFunc = pNCS.summaryString
+	p.absPath = FU.AbsFP(FP.Join(NordEng.rootPath, aPath))
+	p.lineSummaryFunc = NordEng.summaryString
 	// p.isDir =
 	return p
 }
