@@ -51,10 +51,10 @@ func (p *Nord) LineSummaryString() string {
 	if p.NextKid() != nil { sb.WriteString("N ") }
 	if p.HasKids() { sb.WriteString("kid(s) ") }
 	*/
-	if p.path == "" {
+	if p.relPath == "" {
 		sb.WriteString("NOPATH")
 	} else {
-		sb.WriteString(p.path)
+		sb.WriteString(p.relPath)
 	}
 	return (sb.String())
 }

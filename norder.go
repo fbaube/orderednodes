@@ -15,6 +15,7 @@ type Norder interface {
 	IsRoot() bool
 	GetRoot() Norder
 	IsDir() bool
+	// IsDirlike() bool // FIXME: add this!
 	// SetIsRoot(bool)
 	Parent() Norder
 	HasKids() bool
