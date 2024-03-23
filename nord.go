@@ -113,16 +113,32 @@ func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 		L.L.Error("NewRootNord: missing root path")
 		return nil 
 	}
-	p := NewNord(".")
+	p := NewNord("./")
 	if p == nil { return nil }
 	// NOTE the next stmt assumes *filesystem* not XML DOM 
-	p.absPath = FU.AbsFP(FP.Clean(rootPath))
+	// p.absPath = FU.AbsFP(FP.Clean(rootPath))
+	asAbsPath := FU.EnsureTrailingPathSep(FP.Clean(rootPath))
 	// Verify that it is in fact a directory
-	fm := FU.NewFileMeta(p.absPath.S())
+	fm := FU.NewFileMeta(asAbsPath)
 	if !fm.IsDir() {
 		L.L.Error("NewRootNord: path is not a dir: " + p.absPath.S())
 		return nil
 	}
+
+	// CHECK THE PATHS
+	L.L.Warning("RootNode's abs: " + p.absPath.S())
+	L.L.Warning("RootNode's rel: " + p.relPath)
+
+	p.absPath = FU.AbsFP(asAbsPath)
+	// For the relative path, try to trim the entire
+	// RootNode RootPath off of this absolute path.
+	// func CutPrefix(s, prefix string) (after string, found bool):
+	// It returns s without the provided leading prefix 
+	// string and reports whether it found the prefix.
+	// If s dusn't start with prefix, CutPrefix returns (s, false).
+	// If prefix is the empty string, CutPrefix returns (s, true).
+	
+	p.relPath = p.absPath.S()
 	p.isRoot = true
 	p.isDir = true 
 	return p
