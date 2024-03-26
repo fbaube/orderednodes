@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.0
 
 require (
-	github.com/fbaube/fileutils v0.0.0-20240322195951-f7eac492460a
+	github.com/fbaube/fileutils v0.0.0-20240325110318-0c80a6fa64f5
 	github.com/fbaube/mlog v0.0.0-20230904080411-cfac35fed413
 )
 
@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mgutz/str v1.2.0 // indirect
-	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81 // indirect
+	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

@@ -106,7 +106,7 @@ func nordPrintCssOneLinerPre(p Norder) error {
 		// <li><details><summary><i>Ice</i> giants</summary>
 		// <ul>
 		fmt.Fprintf(printTreeTo, "<li><details><summary>"+
-			smry+"</summary>\nul")
+			smry+"</summary>\n<!--ul> ")
 		// }
 	} else {
 		// Do both Pre AND Post

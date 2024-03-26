@@ -28,6 +28,10 @@ github.com/fbaube/fileutils v0.0.0-20240321184736-e74b758e4e0d h1:JUQhIbMw0hhMp4
 github.com/fbaube/fileutils v0.0.0-20240321184736-e74b758e4e0d/go.mod h1:2S3eE5mz+17RSb7T/5fn3A0LbHN14T/gftJtFIK7mFA=
 github.com/fbaube/fileutils v0.0.0-20240322195951-f7eac492460a h1:X1NIo9FY9Rm//3BcnYJf1Eyx/NYFNVaVmVODoeIhIuo=
 github.com/fbaube/fileutils v0.0.0-20240322195951-f7eac492460a/go.mod h1:2S3eE5mz+17RSb7T/5fn3A0LbHN14T/gftJtFIK7mFA=
+github.com/fbaube/fileutils v0.0.0-20240325105828-dd11185097a9 h1:QYnX2CE/LdiYWZLsP0OZIORe1T5DLJyPvIAAuINde+w=
+github.com/fbaube/fileutils v0.0.0-20240325105828-dd11185097a9/go.mod h1:Lz2/eUvVeFg1Alb90F0khxrhLR1ujclRNfEHSjBkkL0=
+github.com/fbaube/fileutils v0.0.0-20240325110318-0c80a6fa64f5 h1:RJ1zhFfL6+aSGYcW1C+hmHNtrKp/up7huE6rlETbb/o=
+github.com/fbaube/fileutils v0.0.0-20240325110318-0c80a6fa64f5/go.mod h1:Lz2/eUvVeFg1Alb90F0khxrhLR1ujclRNfEHSjBkkL0=
 github.com/fbaube/humanbytes v0.0.0-20240227103335-a0b11501ad0e h1:2lRZ3QxDYaZ9F7RXLSL3zugdmeQTGOrRddBk+RVTRY0=
 github.com/fbaube/humanbytes v0.0.0-20240227103335-a0b11501ad0e/go.mod h1:WUS3tn4t+FViNsl4VOqYiV51cJNIIeMjLI9fOfm+Ug8=
 github.com/fbaube/logutils v0.0.0-20240118190821-fba0e702dd07 h1:pnt16LF2Gq3myuCjvsTRqc6KUUquBD+gIV9YKHsH+qw=
@@ -63,6 +67,8 @@ golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f h1:3CW0unweImhOzd5FmYuRsD4Y4
 golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f/go.mod h1:CxmFvTBINI24O/j8iY7H1xHzx2i4OsyguNBmN/uPtqc=
 golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81 h1:6R2FC06FonbXQ8pK11/PDFY6N6LWlf9KlzibaCapmqc=
 golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81/go.mod h1:CQ1k9gNrJ50XIzaKCRR2hssIjF07kZFEiieALBM/ARQ=
+golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 h1:aAcj0Da7eBAtrTp03QXWvm88pSyOt+UgdZw2BFZ+lEw=
+golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8/go.mod h1:CQ1k9gNrJ50XIzaKCRR2hssIjF07kZFEiieALBM/ARQ=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.16.0 h1:xWw16ngr6ZMtmxDyKyIgsE93KNKz5HKmMa3b8ALHidU=
