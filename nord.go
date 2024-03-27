@@ -108,26 +108,24 @@ func (p *Nord) IsDir() bool {
 // set elsewhere, and must be set in the global [NordEng] before any
 // child Nord is created using [NewNord].
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
-	L.L.Info("NewRootNord: starting seqID: %d", NordEng.nexSeqID)
+	L.L.Dbg("NewRootNord: starting seqID: %d", NordEng.nexSeqID)
 	if rootPath == "" {
 		L.L.Error("NewRootNord: missing root path")
 		return nil 
 	}
-	p := NewNord("./")
-	if p == nil { return nil }
-	// NOTE the next stmt assumes *filesystem* not XML DOM 
-	// p.absPath = FU.AbsFP(FP.Clean(rootPath))
+	// NOTE the next stmts assume *filesystem* not XML DOM 
 	asAbsPath := FU.EnsureTrailingPathSep(FP.Clean(rootPath))
 	// Verify that it is in fact a directory
-	fm := FU.NewFileMeta(asAbsPath)
-	if !fm.IsDir() {
-		L.L.Error("NewRootNord: path is not a dir: " + p.absPath.S())
+	if !FU.IsDirAndExists(asAbsPath) {
+		L.L.Error("NewRootNord: path is not a dir: " + asAbsPath)
 		return nil
 	}
+	p := NewNord(asAbsPath)
+	if p == nil { return nil }
 
 	// CHECK THE PATHS
-	L.L.Warning("RootNode's abs: " + p.absPath.S())
-	L.L.Warning("RootNode's rel: " + p.relPath)
+	L.L.Dbg("RootNode's abs: " + p.absPath.S())
+	L.L.Dbg("RootNode's rel: " + p.relPath)
 
 	p.absPath = FU.AbsFP(asAbsPath)
 	// For the relative path, try to trim the entire
@@ -160,7 +158,11 @@ func NewNord(aRelPath string) *Nord {
 	NordEng.nexSeqID += 1
 	// L.L.Dbg("NewNord: seqID is now %d", NordEng.nexSeqID)
 	p.relPath = aRelPath
-	p.absPath = FU.AbsFP(FP.Join(NordEng.rootPath, aRelPath))
+	asAbsPath := FP.Join(NordEng.rootPath, aRelPath)
+	if FU.IsDirAndExists(asAbsPath) {
+	   asAbsPath = FU.EnsureTrailingPathSep(asAbsPath)
+	   }
+	p.absPath = FU.AbsFilePath(asAbsPath) 
 	p.lineSummaryFunc = NordEng.summaryString
 	// p.isDir =... sorry, not done here 
 	return p

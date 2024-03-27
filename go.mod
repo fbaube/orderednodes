@@ -5,13 +5,13 @@ go 1.22
 toolchain go1.22.0
 
 require (
-	github.com/fbaube/fileutils v0.0.0-20240325110318-0c80a6fa64f5
+	github.com/fbaube/fileutils v0.0.0-20240326135138-a85c3bc4c0ed
 	github.com/fbaube/mlog v0.0.0-20230904080411-cfac35fed413
 )
 
 require (
 	github.com/fatih/color v1.16.0 // indirect
-	github.com/fbaube/ctoken v0.0.0-20240322195920-6d5d80a301ae // indirect
+	github.com/fbaube/ctoken v0.0.0-20240326135115-74e3cecb9b66 // indirect
 	github.com/fbaube/humanbytes v0.0.0-20240227103335-a0b11501ad0e // indirect
 	github.com/fbaube/logutils v0.0.0-20240118190821-fba0e702dd07 // indirect
 	github.com/fbaube/miscutils v0.0.0-20240307083109-5e380dcbb1e7 // indirect
