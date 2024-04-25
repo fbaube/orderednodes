@@ -108,7 +108,7 @@ func (p *Nord) IsDir() bool {
 // set elsewhere, and must be set in the global [NordEng] before any
 // child Nord is created using [NewNord].
 func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
-	L.L.Dbg("NewRootNord: starting seqID: %d", NordEng.nexSeqID)
+	L.L.Debug("NewRootNord: starting seqID: %d", NordEng.nexSeqID)
 	if rootPath == "" {
 		L.L.Error("NewRootNord: missing root path")
 		return nil 
@@ -124,8 +124,8 @@ func NewRootNord(rootPath string, smryFunc StringFunc) *Nord {
 	if p == nil { return nil }
 
 	// CHECK THE PATHS
-	L.L.Dbg("RootNode's abs: " + p.absPath.S())
-	L.L.Dbg("RootNode's rel: " + p.relPath)
+	L.L.Debug("RootNode's abs: " + p.absPath.S())
+	L.L.Debug("RootNode's rel: " + p.relPath)
 
 	p.absPath = FU.AbsFP(asAbsPath)
 	// For the relative path, try to trim the entire
@@ -156,7 +156,7 @@ func NewNord(aRelPath string) *Nord {
 	// p.lineSummaryFunc = NordSummaryString // func
 	p.seqID = NordEng.nexSeqID
 	NordEng.nexSeqID += 1
-	// L.L.Dbg("NewNord: seqID is now %d", NordEng.nexSeqID)
+	// L.L.Debug("NewNord: seqID is now %d", NordEng.nexSeqID)
 	p.relPath = aRelPath
 	asAbsPath := FP.Join(NordEng.rootPath, aRelPath)
 	if FU.IsDirAndExists(asAbsPath) {
