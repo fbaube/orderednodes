@@ -7,7 +7,7 @@ import (
 // Norder is satisfied by *Nord NOT by Nord
 type Norder interface {
 	// PUBLIC METHODS
-	SeqID() int
+	// SeqID() int
 	// SetSeqID(int)
 	Level() int
 	RelFP() string

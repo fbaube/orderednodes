@@ -6,7 +6,7 @@ type NordEngine struct {
 	// nexSeqID should be reset to 0 when starting another tree ?
 	// No, because every single entity (dir/file) gets one,
 	// even if it is listed on the CLI as an individual file.
-	nexSeqID      int
+	// nexSeqID      int
 	rootPath      string
 	summaryString StringFunc
 }

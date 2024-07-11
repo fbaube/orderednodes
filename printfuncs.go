@@ -22,13 +22,15 @@ func (p *Nord) Echo() string {
 func (p Nord) LinePrefixString() string {
 	if p.isRoot { // && p.Parent == nil
 		return "[R]"
-	} else if p.Level() == 0 && p.Parent() != nil {
-		return fmt.Sprintf("[%d]", p.seqID)
+	// } else if p.Level() == 0 && p.Parent() != nil {
+	} else if p.Level() == 0 || p.Parent() != nil {
+		// return fmt.Sprintf("[%d]", p.seqID)
+		return "[?!R?!]"
 	} else {
 		// (spaces)[lvl:seq]"
 		// func S.Repeat(s string, count int) string
-		return fmt.Sprintf("%s[%02d:%02d]",
-			S.Repeat("  ", p.level-1), p.level, p.seqID)
+		return fmt.Sprintf("%s[%02d]", // "%s[%02d:%02d]", 
+			S.Repeat("  ", p.level-1), p.level) // ,p.seqID)
 	}
 }
 
