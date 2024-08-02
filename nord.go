@@ -58,6 +58,9 @@ type StringFunc func(Norder) string
 // variant of Nord that has unordered kids. 
 // .
 type Nord struct {
+
+     	// STRUCTURE for Materialized Paths
+	
 	// relPath is the relative path of this Nord, relative to its 
 	// tree's root Nord, which is the "local root" shared w other 
 	// Nords in the same interconnected tree. (That is to say, a 
@@ -71,11 +74,14 @@ type Nord struct {
 	// it is rooted at the filesystem root. For a markup node 
 	// or a map/ToC file, it is rooted at the document start.
 	absPath FU.AbsFilePath
+	
 	// isRoot true has a relPath of "." and an absPath that is the 
 	// rooted absolute path of this root node w.r.t. the external
 	// environment (for a file or dir, the file system root; for
-	// a markup node, the absolute path of the contianing file. 
-	isRoot bool 
+	// a markup node, the absolute path of the containing file. 
+	isRoot bool
+	// isDir is obvious for files & dirs BUT not (yet) for symlinks. 
+	isDir  bool
 	// level is equal to the number of "/" filepath separators
 	// separating path elements (i.e. not including any trailing
 	// separator). Therefore it is 0 for an XML document root node
@@ -83,12 +89,10 @@ type Nord struct {
 	// isRoot() is true and parent() is nil)), and it is >0 for
 	// others. Reserve negative numbers for future (ab)use.
 	level int
-	// STRUCTURE for Adjacency List based on Go ptrs (not indices)
-	parent            Norder // level up
-	firstKid, lastKid Norder // level down
-	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?) 
-	// seqID is NOTE temporarily unused ::
-	// a unique ID under this node's tree's root. It does not 
+
+	// Temporarily unused: three fields
+	
+	// seqID is a unique ID under this node's tree's root. It does not 
 	// need to be the same as (say) the index of this Nord in a slice 
 	// of Nord's, but it probably is. Its use is optional, and also 
 	// it can be used in other ways in structs that embed Nord.
@@ -100,8 +104,22 @@ type Nord struct {
 	// themselves. The bracketing by commas makes searching
 	// simpler (",%d,").
 	parSeqID, kidSeqID string
-	lineSummaryFunc    StringFunc
-	isDir              bool
+	
+	// STRUCTURE for Adjacency List based on Go ptrs (not indices)
+	
+	parent            Norder // level up
+	firstKid, lastKid Norder // level down
+	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?)
+
+	// STRUCTURE for Adjacency List based on indices
+	
+	// kidIndxs when empty is ",", else e.g. ",1,4,56,". 
+	// The kidIdxs should be in the same order as the 
+	// Kid nodes themselves. The bracketing by commas 
+	// makes searching simpler (",%d,").
+	parIdx, kidIdxs string
+	
+	lineSummaryFunc StringFunc
 }
 
 // RootNord is defined, so that assignments

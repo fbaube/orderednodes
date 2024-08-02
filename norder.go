@@ -24,7 +24,8 @@ type Norder interface {
 	PrevKid() Norder
 	NextKid() Norder
 	KidsAsSlice() []Norder
-	AddKid(Norder) Norder
+	AddKid(Norder) Norder // returns the kid 
+	AddKids([]Norder) Norder // returns the method target - the parent of all the kids 
 	ReplaceWith(Norder) Norder
 	SetParent(Norder)
 	SetPrevKid(Norder)

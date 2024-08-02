@@ -87,6 +87,63 @@ func (p *Nord) AddKid(aKid Norder) Norder { // returns aKid
 	panic("AddKid: Chaos!")
 }
 
+// AddKids adds the supplied nodes as kids, after any pre-existing
+// kids, and returns the parent. 
+func (p *Nord) AddKids(rKids []Norder) Norder { // returns p 
+	// fmt.Printf("nord: ptrs? aKid<%T> p<%T> \n", aKid, p)
+	for _, aKid := range rKids {	
+	    if aKid.PrevKid() != nil || aKid.NextKid() != nil {
+		fmt.Fprintf(os.Stdout, "FATAL in AddKids: Tag<< %+v >> kid<< %+v >>\n", p, aKid)
+		panic("AddKids(K) can't cos K has siblings")
+		}
+	    if aKid.Parent() != nil && aKid.Parent() != p {
+		fmt.Fprintf(os.Stdout, "FATAL in AddKids: Tag<< %+v >> kid<< %+v >>\n", p, aKid)
+		panic("E.AddKids(K) can't cos K has non-P parent")
+		}
+	    // All clear! Go ahead and add the kid.
+	    _ = p.AddKid(aKid)
+	}
+	/*
+	var FK = p.firstKid
+	var LK = p.lastKid
+	// Set the level now
+	aKid.setLevel(p.Level() + 1)
+	// Is the new kid an only kid ?
+	if FK == nil && LK == nil {
+		p.firstKid, p.lastKid = aKid, aKid
+		aKid.SetParent(p)
+		aKid.SetPrevKid(nil)
+		aKid.SetNextKid(nil)
+		return aKid
+	}
+	if !(FK != nil && LK != nil) {
+		panic("BAD KID LINKS")
+	}
+	// So, replace the last kid
+	if LK != nil {
+		if LK.Parent() != p {
+			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", p, aKid)
+			panic("E.AddKid: E's last kid dusnt know E")
+		}
+		if LK.NextKid() != nil {
+			fmt.Fprintf(os.Stdout, "FATAL in AddKid: E<< %+v >> K<< %+v >>\n", p, aKid)
+			panic("E.AddKid: E's last kid has a next kid")
+		}
+		LK.SetNextKid(aKid) // LK.nextKid = aKid
+		aKid.SetPrevKid(LK) // aKid.prevKid = LK
+		p.lastKid = aKid
+		aKid.SetParent(p)
+		return aKid
+	}
+
+	}
+	fmt.Fprintf(os.Stdout, "FATAL in AddKids: " +
+		"E<< %+v >> K<< %+v >>\n", p, rKids)
+	panic("AddKids: Chaos!")
+	*/
+	return p
+}
+
 // FirstKid provides read-only access for other packages. Can return nil.
 func (p *Nord) FirstKid() Norder {
 	return p.firstKid
