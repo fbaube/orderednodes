@@ -13,20 +13,39 @@ import (
 // func (*Nord) FuncName() string
 type StringFunc func(Norder) string
 
-// NOTE: Ignore https://godoc.org/golang.org/x/net/html#Node
-// (and many other available implementations of "Node" data structure).
+// NOTE that in this file, we endeavor to ignore the many, many
+// other implementatoins "out there" of the Node data structure
+// type, including https://godoc.org/golang.org/x/net/html#Node
 
 // Nord is shorthand for "ordered node" (or "ordinal node") - a Node with
 // ordered children nodes: the child nodes have a specific specified order.
-// This lets us define such funcs as FirstKid, NextKid, PrevKid, LastKid. 
-// They are defined in interface [Norder]. A Nord also contains its own
-// relative path (relative to its inbatch) and absolute paths.
+// Ordering is essential for representation of content. (It can be helpful
+// in other contexts too, such as filesystem operation, but it turns out
+// that the Go stdlib generally returns directory items in lexical order,
+// and walks directory listings in lexical order.)
+// 
+// The ordering lets us define funcs like FirstKid, NextKid, PrevKid,
+// LastKid. They are defined in interface [Norder]. A Nord also contains
+// its own relative path (relative to its inbatch) and absolute paths.
 //
 // There are three use cases identified for Nords:
 //  - files & directories (here ordering is less important) 
 //  - DOM markup (this creates problems handling same-named sibling nodes)
-//  - [Lw]DITA map files (these should be an ideal use case) 
+//  - [Lw]DITA map files and other ToC's (these should be an ideal use case) 
 //
+// Also there are two distinct memory management nodes for allocating
+// and linking nodes:
+//  - The "traditional method" of allocating nodes individually, and linking
+//    them using pointers.
+//  - The "new-fangled way" called an "arena", where we put all our nodes in
+//    a big slice, and link them using indices; this method is much kinder
+//    on memory management, but might becomes clumsy when we need dynamic
+//    node management.
+//
+// Also there are multiple ways to represent node trees in our SQLite DBMS,
+// and multiple ways to walk a node tree, so there is a unavoidable complexity
+// wherever we look. 
+// 
 // NOTE: DOM markup exhibits name duplication: we never have two same-named
 // files in the same directory, but we might (e.g.) have multiple sibling
 // <p> tags. So when representing markup, a map from paths to Nords would 
@@ -59,8 +78,9 @@ type StringFunc func(Norder) string
 // .
 type Nord struct {
 
-     	// STRUCTURE for Materialized Paths
-	
+     	// ----------------------------------
+     	//  Substructure: Materialized Paths
+     	// ----------------------------------	
 	// relPath is the relative path of this Nord, relative to its 
 	// tree's root Nord, which is the "local root" shared w other 
 	// Nords in the same interconnected tree. (That is to say, a 
