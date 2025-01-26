@@ -28,19 +28,30 @@ type StringFunc func(Norder) string
 // LastKid. They are defined in interface [Norder]. A Nord also contains
 // its own relative path (relative to its inbatch) and absolute paths.
 //
+// Alternatives Everywhere
+// 
 // There are three use cases identified for Nords:
 //  - files & directories (here ordering is less important) 
-//  - DOM markup (this creates problems handling same-named sibling nodes)
+//  - XML/HTML/DOM markup (this creates problems handling same-named siblings)
 //  - [Lw]DITA map files and other ToC's (these should be an ideal use case) 
 //
-// Also there are two distinct memory management nodes for allocating
-// and linking nodes:
+// Also there are two distinct memory management nodes for allocating and
+// linking nodes:
 //  - The "traditional method" of allocating nodes individually, and linking
-//    them using pointers.
+//    them using pointers. Using this method, both deletions and insertions
+//    are relatively simple. 
 //  - The "new-fangled way" called an "arena", where we put all our nodes in
-//    a big slice, and link them using indices; this method is much kinder
+//    a big slice, and link them using indices. This method is much kinder
 //    on memory management, but might becomes clumsy when we need dynamic
 //    node management.
+//     - Deletions are easy if we just zero out the slice entry; we cannot
+//       then do compaction because it would require updating all indices
+//       past the first point of compaction.
+//     - Insertions are costly. However note that in this implementation,
+//       for a node's kids, we use a linked list rather than a slice, so
+//       this makes it easier to append a new node at the end of the
+//       arena slice and then update indices, wherever they may be
+//       elsewhere in the slice. 
 //
 // Also there are multiple ways to represent node trees in our SQLite DBMS,
 // and multiple ways to walk a node tree, so there is a unavoidable complexity
@@ -93,8 +104,7 @@ type Nord struct {
 	// system (or documwnt). For a file or dir in a filesystem, 
 	// it is rooted at the filesystem root. For a markup node 
 	// or a map/ToC file, it is rooted at the document start.
-	absPath FU.AbsFilePath
-	
+	absPath FU.AbsFilePath	
 	// isRoot true has a relPath of "." and an absPath that is the 
 	// rooted absolute path of this root node w.r.t. the external
 	// environment (for a file or dir, the file system root; for
@@ -103,42 +113,57 @@ type Nord struct {
 	// isDir is obvious for files & dirs BUT not (yet) for symlinks. 
 	isDir  bool
 	// level is equal to the number of "/" filepath separators
-	// separating path elements (i.e. not including any trailing
-	// separator). Therefore it is 0 for an XML document root node
-	// or the local root of a file & dir tree (where in both cases,
-	// isRoot() is true and parent() is nil)), and it is >0 for
-	// others. Reserve negative numbers for future (ab)use.
+	// *separating* path elements (i.e. not including any leading 
+	// or trailing separators). Therefore it is 0 for an XML docu-
+	// ment root node or the local root of a file & dir tree (where 
+	// in both cases, isRoot() is true and parent() is nil)), and it 
+	// is >0 for others. Reserve negative numbers for future (ab)use.
 	level int
-
-	// Temporarily unused: three fields
-	
+     	// ----------------------------------
+	//  Temporarily unused: three fields	
+     	// ----------------------------------
 	// seqID is a unique ID under this node's tree's root. It does not 
 	// need to be the same as (say) the index of this Nord in a slice 
 	// of Nord's, but it probably is. Its use is optional, and also 
 	// it can be used in other ways in structs that embed Nord.
-	// seqID int
+	// >> seqID int
 	// parSeqID and kidSeqID's can add a layer of error checking 
 	// and simplified access. Their use is optional.
 	// kidSeqIds when empty is ",", otherwise e.g. ",1,4,56,". 
-	// the seqIds should be in the same order as the Kid nodes 
-	// themselves. The bracketing by commas makes searching
-	// simpler (",%d,").
-	parSeqID, kidSeqID string
-	
-	// STRUCTURE for Adjacency List based on Go ptrs (not indices)
-	
+	// the seqIds should (well, can) be in the same order as 
+	// the Kid nodes themselves. The bracketing by commas makes 
+	// searching simpler (",%d,").
+	// >> parSeqID, kidSeqID string
+     	// ---------------------------------
+	//  Substructure for Adjacency List 
+	//   based on Go ptrs (not indices)
+     	// ---------------------------------	
 	parent            Norder // level up
 	firstKid, lastKid Norder // level down
 	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?)
-
-	// STRUCTURE for Adjacency List based on indices
-	
-	// kidIndxs when empty is ",", else e.g. ",1,4,56,". 
+     	// ---------------------------------
+	//  Substructure for Adjacency List
+	//  based on indices into "arena"
+	//  slice (not using ptrs) 
+     	// ---------------------------------
+	// Alternative 1 (used): use the same idea 
+	// as when using ptrs, i.e. point to parent 
+	// and to peers in own list and to first and
+	// last kids in the linked list of all kids. 
+	iParent             int // level up
+	iFirstKid, iLastKid int // level down
+	iPrevKid, iNextKid  int // level same (rename "Kid" => "Peer" ?)
+	// Alternative 2 (unused): a single string 
+	// field holds all applicable indices.
+	// kidIdxs when empty is ",", else e.g. ",1,4,56,". 
 	// The kidIdxs should be in the same order as the 
 	// Kid nodes themselves. The bracketing by commas 
 	// makes searching simpler (",%d,").
-	parIdx, kidIdxs string
-	
+	// >> parIdx, kidIdxs string
+
+	// This is a handy utility function, but 
+	// maybe just implementing+using interface
+	// Stringser would be a better idea. 
 	lineSummaryFunc StringFunc
 }
 
