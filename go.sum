@@ -22,6 +22,8 @@ github.com/fbaube/miscutils v0.0.0-20240914143110-b98201fa8b4e h1:nly5+uEAdUq4UI
 github.com/fbaube/miscutils v0.0.0-20240914143110-b98201fa8b4e/go.mod h1:smjQdWsE6GthPacgvVUhKLNMUcN6Sf+gIvaUweTius4=
 github.com/fbaube/miscutils v0.0.0-20250121061531-3eeb9462af67 h1:lTnt8jw9jN9iA6fp0ws5clVW/4qfNykSNmS94eFJD5Q=
 github.com/fbaube/miscutils v0.0.0-20250121061531-3eeb9462af67/go.mod h1:smjQdWsE6GthPacgvVUhKLNMUcN6Sf+gIvaUweTius4=
+github.com/fbaube/miscutils v0.0.0-20250126181629-6a2fa9af43b7 h1:7EDgdU9hotwYEf5Bx7w4I6SNm/rwOx88siLiD0o+xl8=
+github.com/fbaube/miscutils v0.0.0-20250126181629-6a2fa9af43b7/go.mod h1:v32q0zwZh3Ft6WFuIdeLPwPgOAIy5h0AAPoJRi9DF6k=
 github.com/fbaube/mlog v0.0.0-20240425064535-3b89e3b28a76 h1:C1SjY+GWMR1smUZqspWm52AYfDq30fIjRzmy+ar+a8M=
 github.com/fbaube/mlog v0.0.0-20240425064535-3b89e3b28a76/go.mod h1:kmnrjIOIydIQG0XoPcMoQ9XYJmVTt9fOByMvkDiDBTo=
 github.com/fbaube/stringutils v0.0.0-20240923132734-4299299a2f4d h1:0vtZZWaX3Vs9/4N1KUUkyVDMSFJU4T5YVwCezttglXw=

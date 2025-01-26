@@ -242,21 +242,23 @@ func NewNord(aRelPath string) *Nord {
 	return p
 }
 
-func (p *Nord) GetLineSummaryFunc() StringFunc {
+func (p *Nord) LineSummaryFunc() StringFunc {
 	return p.lineSummaryFunc
 }
 
+/*
 func (p *Nord) SetLineSummaryFunc(sf StringFunc) {
 	p.lineSummaryFunc = sf
 }
+*/
 
 // IsRoot is duh.
 func (p *Nord) IsRoot() bool {
 	return p.isRoot
 }
 
-// GetRoot is duh.
-func (p *Nord) GetRoot() Norder {
+// Root is duh.
+func (p *Nord) Root() RootNorder {
 	if p.IsRoot() {
 		return p
 	}

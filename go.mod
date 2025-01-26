@@ -15,7 +15,7 @@ require (
 	github.com/fbaube/dsmnd v0.0.0-20250111125333-2b80f885bfc2 // indirect
 	github.com/fbaube/humanbytes v0.0.0-20250119091546-d58fbfdd444c // indirect
 	github.com/fbaube/logutils v0.0.0-20240425064504-eb572963f0fc // indirect
-	github.com/fbaube/miscutils v0.0.0-20250121061531-3eeb9462af67 // indirect
+	github.com/fbaube/miscutils v0.0.0-20250126181629-6a2fa9af43b7 // indirect
 	github.com/fbaube/stringutils v0.0.0-20250120124849-e15d0abeb13c // indirect
 	github.com/fbaube/wasmutils v0.0.0-20231209183154-e25018375bc2 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect

@@ -91,7 +91,7 @@ func (p *Nord) PrintCssTree(w io.Writer) error {
 
 func nordPrintOneLiner(p Norder) error {
 	// var F StringFunc
-	// F = p.GetLineSummaryFunc()
+	// F = p.LineSummaryFunc()
 	// fmt.Fprintf(printTreeTo, "%s %s (%T) \n", p.LinePrefixString(), F(p), p)
 	// fmt.Fprintf(printTreeTo, "%s %s (%T) \n", p.LinePrefixString(), "?", p)
 	fmt.Fprintf(printTreeTo, p.LineSummaryString())
