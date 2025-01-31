@@ -19,14 +19,16 @@ type StringFunc func(Norder) string
 
 // Nord is shorthand for "ordered node" (or "ordinal node") - a Node with
 // ordered children nodes: the child nodes have a specific specified order.
-// Ordering is essential for representation of content. (It can be helpful
-// in other contexts too, such as filesystem operation, but it turns out
-// that the Go stdlib generally returns directory items in lexical order,
-// and walks directory listings in lexical order.)
+// Ordering is essential for representation of content.
+//
+// (It can help in other contexts too, such as filesystem operations,
+// but it turns out that the Go stdlib generally returns directory
+// items in lexical order and walks directories in lexical order.)
 // 
 // The ordering lets us define funcs like FirstKid, NextKid, PrevKid,
-// LastKid. They are defined in interface [Norder]. A Nord also contains
-// its own relative path (relative to its inbatch) and absolute paths.
+// LastKid. They are defined in interface [Norder]. A Nord for file/dir
+// also contains its own relative path (relative to its inbatch) and
+// absolute path. 
 //
 // Alternatives Everywhere
 // 
@@ -39,7 +41,9 @@ type StringFunc func(Norder) string
 // linking nodes:
 //  - The "traditional method" of allocating nodes individually, and linking
 //    them using pointers. Using this method, both deletions and insertions
-//    are relatively simple. 
+//    are relatively simple.
+//     - Such nodes can also be loaded into a map, for random access to nodes
+//       based on path. 
 //  - The "new-fangled way" called an "arena", where we put all our nodes in
 //    a big slice, and link them using indices. This method is much kinder
 //    on memory management, but might becomes clumsy when we need dynamic
@@ -50,8 +54,12 @@ type StringFunc func(Norder) string
 //     - Insertions are costly. However note that in this implementation,
 //       for a node's kids, we use a linked list rather than a slice, so
 //       this makes it easier to append a new node at the end of the
-//       arena slice and then update indices, wherever they may be
-//       elsewhere in the slice. 
+//       arena-slice and then update indices, wherever they may be
+//       elsewhere in the slice.
+//     - In any case, if an arena-slice has to grow (because of a call 
+//       to append), it might be moved elsewhere in memory, which would
+//       invalidate all ptrs to other Nords! If this happens, we should
+//       trust only the "traditional method".
 //
 // Also there are multiple ways to represent node trees in our SQLite DBMS,
 // and multiple ways to walk a node tree, so there is a unavoidable complexity
@@ -257,7 +265,8 @@ func (p *Nord) IsRoot() bool {
 	return p.isRoot
 }
 
-// Root is duh.
+// Root walks the tree upward until [IsRoot] is true,
+// so it does not use any global variables.
 func (p *Nord) Root() RootNorder {
 	if p.IsRoot() {
 		return p
