@@ -142,6 +142,12 @@ type Nord struct {
 	// the Kid nodes themselves. The bracketing by commas makes 
 	// searching simpler (",%d,").
 	// >> parSeqID, kidSeqID string
+
+	// ==================================================
+	//  Note for all implementations of adjacency lists: 
+	//  Point to parent, to peers in own list, and to 
+	//  first and last kids in linked list of all kids. 
+     	// ==================================================
      	// ---------------------------------
 	//  Substructure for Adjacency List 
 	//   based on Go ptrs (not indices)
@@ -149,25 +155,22 @@ type Nord struct {
 	parent            Norder // level up
 	firstKid, lastKid Norder // level down
 	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?)
-     	// ---------------------------------
-	//  Substructure for Adjacency List
-	//  based on indices into "arena"
-	//  slice (not using ptrs) 
-     	// ---------------------------------
-	// Alternative 1 (used): use the same idea 
-	// as when using ptrs, i.e. point to parent 
-	// and to peers in own list and to first and
-	// last kids in the linked list of all kids. 
+     	// ----------------------------------------
+	//  Substructure for Adjacency List based
+	//  on discrete indices into "arena" slice 
+     	// ----------------------------------------
 	iParent             int // level up
 	iFirstKid, iLastKid int // level down
 	iPrevKid, iNextKid  int // level same (rename "Kid" => "Peer" ?)
-	// Alternative 2 (unused): a single string 
-	// field holds all applicable indices.
-	// kidIdxs when empty is ",", else e.g. ",1,4,56,". 
-	// The kidIdxs should be in the same order as the 
-	// Kid nodes themselves. The bracketing by commas 
-	// makes searching simpler (",%d,").
-	// >> parIdx, kidIdxs string
+     	// ----------------------------------------
+	//  Substructure for Adjacency List of KIDS
+	//  where they are stored on a single string 
+	//  field that holds all applicable indices.
+	//  kidIdxs when empty is ",", else e.g. ",1,4,56,". 
+	//  The kidIdxs should be in the same order as 
+	//  the Kid nodes themselves. The bracketing by 
+	//  commas makes searching simpler (",%d,").
+	kidIdxs string
 
 	// This is a handy utility function, but 
 	// maybe just implementing+using interface
