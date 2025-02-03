@@ -162,14 +162,16 @@ type Nord struct {
 	iParent             int // level up
 	iFirstKid, iLastKid int // level down
 	iPrevKid, iNextKid  int // level same (rename "Kid" => "Peer" ?)
-     	// ----------------------------------------
+     	// ------------------------------------------
 	//  Substructure for Adjacency List of KIDS
 	//  where they are stored on a single string 
 	//  field that holds all applicable indices.
-	//  kidIdxs when empty is ",", else e.g. ",1,4,56,". 
-	//  The kidIdxs should be in the same order as 
-	//  the Kid nodes themselves. The bracketing by 
-	//  commas makes searching simpler (",%d,").
+	// ------------------------------------------
+	//  kidIdxs when empty is "," (or ""), else
+	// e.g. ",1,4,56,". The kidIdxs should be in
+	// the same order as the Kid nodes themselves.
+	// Comma-bracketing simplifies search (",%d,").
+	// ------------------------------------------
 	kidIdxs string
 
 	// This is a handy utility function, but 
