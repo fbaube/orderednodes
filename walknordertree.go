@@ -10,7 +10,7 @@ package orderednodes
 // that is simple to comprehend.
 //
 // Anyways FP.WalkDir is the best. It doesn't try to hide symlinks away.
-// And we are quite happy to use fileutils/FSItem 
+// And we are quite happy to use fileutils/FSObject. 
 
 import (
 	"io/fs"

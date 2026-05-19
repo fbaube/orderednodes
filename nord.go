@@ -14,28 +14,42 @@ import (
 type StringFunc func(Norder) string
 
 // NOTE that in this file, we endeavor to ignore the many, many
-// other implementatoins "out there" of the Node data structure
+// other implementations "out there" of the Node data structure
 // type, including https://godoc.org/golang.org/x/net/html#Node
 
-// Nord is shorthand for "ordered node" (or "ordinal node") - a Node with
-// ordered children nodes: the child nodes have a specific specified order.
-// Ordering is essential for representation of content.
+// Nord is shorthand for "ordered node" (or "ordinal node") -
+// a Node whose child nodes have an externally-defined order,
+// so that child nodes are not directly [Comparable] amongst
+// themselves. This specific specified order or child nodes 
+// is essential for representation of content.
 //
-// (It can help in other contexts too, such as filesystem operations,
-// but it turns out that the Go stdlib generally returns directory
-// items in lexical order and walks directories in lexical order.)
+// (Child ordering can help in other contexts too, such 
+// as filesystem operations, but it turns out that the 
+// Go stdlib generally returns directory items in lexical 
+// order and walks directories in lexical order.)
 // 
-// The ordering lets us define funcs like FirstKid, NextKid, PrevKid,
-// LastKid. They are defined in interface [Norder]. A Nord for file/dir
-// also contains its own relative path (relative to its inbatch) and
-// absolute path. 
+// The ordering lets us define funcs like FirstKid, NextKid, 
+// PrevKid, LastKid. They are defined in interface [Norder].
+// A Nord for file/dir also contains its own relative path
+// (relative to its inbatch) and absolute path. 
+//
+// Usage 
+//
+// Nord is written so that it can be embedded within a larger struct. 
+// We do this rather than define a Nord as a struct that takes a generic
+// argument that defines a node's associated data. It does mean that many
+// methods on Nord need to be methods on pointers rather than methods on
+// values. But the interface [Norder] will be defined on pointers rather
+// than values, so the resulting syntax will be visually acceptable. 
 //
 // Alternatives Everywhere
 // 
 // There are three use cases identified for Nords:
-//  - files & directories (here ordering is less important) 
-//  - XML/HTML/DOM markup (this creates problems handling same-named siblings)
-//  - [Lw]DITA map files and other ToC's (these should be an ideal use case) 
+//  - UC.1: files & directories (here ordering is less important) 
+//  - UC.2: XML/HTML/DOM markup (this has complexity handling
+//          same-named siblings, such as multiple <p> tags)
+//  - UC.3: [Lw]DITA map files and other ToC's (these should
+//          be an ideal use case) 
 //
 // Also there are two distinct memory management nodes for allocating and
 // linking nodes:
@@ -65,41 +79,43 @@ type StringFunc func(Norder) string
 // and multiple ways to walk a node tree, so there is a unavoidable complexity
 // wherever we look. 
 // 
-// NOTE: DOM markup exhibits name duplication: we never have two same-named
-// files in the same directory, but we might (e.g.) have multiple sibling
-// <p> tags. So when representing markup, a map from paths to Nords would 
-// fail unless the tags are made unique with subscript indices, such as
-// "[1]", "[2]", like those used in (e.g.) JQuery.
+// NOTE: DOM markup exhibits name duplication: In UC.1 we never have two
+// same-named files in the same directory, but in UC.2 we might have (for
+// example) multiple sibling <p> tags. So when representing markup, a map
+// from paths to Nords would fail unless the tags are made unique with 
+// subscript indices (such as "[1]", "[2]").
 //
 // NOTE: Using Nords for files & dirs exhibits strong typing. Dirs are
 // dirs and files are files and never the twain shall meet. This means
-// that dirs cannot contain own-content and that files can never be
-// non-leaf nodes. (Note tho that symlinks have aspects of both.) 
+// that (a) dirs cannot contain own-content, and (b) files can never 
+// be non-leaf nodes. (Note tho that symlinks have aspects of both.) 
 // However this dir/file/etc typing is too complex to handle here in 
-// a Nord, so it is handled instead by a struct type that embeds Nord, 
-// such as [fileutils.FSItem]. 
+// a Nord, because a leaf node can be either a file or a dir, and a
+// field like "canKid bool" is a bit OTT, so the file/dir distinction
+// is handled instead by an outer struct type that embeds Nord, such 
+// as [fileutils.FSObject]. 
 //
 // If we build up a tree of Nords when processing an [os.DirFS], the 
 // strict ordering provided by DirFS is not strictly needed, BUT it 
-// can anyways be used (and relied upon) because the three flavors 
-// of WalkDir are deterministic (using lexical order). It means that 
-// a given Nord will always appear AFTER the Nord for its directory
-// has appeared, which makes it much easier to build a tree.
+// can anyways be used (and relied upon) because the three flavors of
+// WalkDir are deterministic (using lexical order). WalkDir does tho
+// promise that a given Nord will always appear AFTER the Nord for 
+// its directory has appeared, which makes it "easy" to build a tree.
 //
 // Link fields are lower-cased so that other packages cannot damage links. 
 //
 // NOTE: This implementation stores pointers to child nodes in a doubly
-// linked list, not a slice, and a Nord does not have a complete set of
-// pointers to all of its kids. Therefore (a) it is not simple to get a
-// kid count, because it requires a list traversal, and (b) it is not
-// feasible to use this same code to define a simpler, more efficient 
-// variant of Nord that has unordered kids. 
+// linked list, not a slice. Therefore a Nord does not have a complete 
+// set of pointers to all of its kids. Therefore (a) it is not simple 
+// to get a kid count, because it requires a list traversal, and
+// (b) it is not feasible to monify this code to define a simpler, 
+// more efficient variant of Nord that has unordered kids. 
 // .
 type Nord struct {
 
-     	// ----------------------------------
-     	//  Substructure: Materialized Paths
-     	// ----------------------------------	
+     	// ======================================
+     	//  Substructure for: Materialized Paths
+     	// ======================================
 	// relPath is the relative path of this Nord, relative to its 
 	// tree's root Nord, which is the "local root" shared w other 
 	// Nords in the same interconnected tree. (That is to say, a 
@@ -127,6 +143,44 @@ type Nord struct {
 	// in both cases, isRoot() is true and parent() is nil)), and it 
 	// is >0 for others. Reserve negative numbers for future (ab)use.
 	level int
+
+     	// ====================================
+	//  Substructures for: Adjacency Lists 
+	// ====================================
+	// Every implementation of adjacency lists points 
+	// (1) to parent, (2) to peers in own list, and 
+	// (3) to first & last kids in linked list of all kids. 
+     	// ------------------------------------
+	//  Substructure for Adjacency List #1 
+	//  based on Go ptrs (not indices)
+     	// ------------------------------------	
+	parent            Norder // level up
+	firstKid, lastKid Norder // level down
+	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?)
+     	// ------------------------------------------
+	//  Substructure for Adjacency List #2 based
+	//  on discrete indices into "arena" slice 
+     	// ------------------------------------------
+	iParent             int // level up
+	iFirstKid, iLastKid int // level down
+	iPrevKid, iNextKid  int // level same (rename "Kid" => "Peer" ?)
+     	// ------------------------------------------
+	//  Substructure for Adjacency List of KIDS
+	//  where they are stored on a single string 
+	//  field that holds all applicable indices.
+	// ------------------------------------------
+	// kidIdxs when empty is "," (or ""), else
+	// e.g. ",1,4,56,". The kidIdxs should be in
+	// the same order as the Kid nodes themselves.
+	// Comma-bracketing simplifies search (",%d,").
+	// ------------------------------------------
+	kidIdxs string
+
+	// This is a handy utility function, but 
+	// maybe just implementing+using interface
+	// Stringser would be a better idea. 
+	lineSummaryFunc StringFunc
+
      	// ----------------------------------
 	//  Temporarily unused: three fields	
      	// ----------------------------------
@@ -142,42 +196,6 @@ type Nord struct {
 	// the Kid nodes themselves. The bracketing by commas makes 
 	// searching simpler (",%d,").
 	// >> parSeqID, kidSeqID string
-
-	// ==================================================
-	//  Note for all implementations of adjacency lists: 
-	//  Point to parent, to peers in own list, and to 
-	//  first and last kids in linked list of all kids. 
-     	// ==================================================
-     	// ---------------------------------
-	//  Substructure for Adjacency List 
-	//   based on Go ptrs (not indices)
-     	// ---------------------------------	
-	parent            Norder // level up
-	firstKid, lastKid Norder // level down
-	prevKid, nextKid  Norder // level same (rename "Kid" => "Peer" ?)
-     	// ----------------------------------------
-	//  Substructure for Adjacency List based
-	//  on discrete indices into "arena" slice 
-     	// ----------------------------------------
-	iParent             int // level up
-	iFirstKid, iLastKid int // level down
-	iPrevKid, iNextKid  int // level same (rename "Kid" => "Peer" ?)
-     	// ------------------------------------------
-	//  Substructure for Adjacency List of KIDS
-	//  where they are stored on a single string 
-	//  field that holds all applicable indices.
-	// ------------------------------------------
-	//  kidIdxs when empty is "," (or ""), else
-	// e.g. ",1,4,56,". The kidIdxs should be in
-	// the same order as the Kid nodes themselves.
-	// Comma-bracketing simplifies search (",%d,").
-	// ------------------------------------------
-	kidIdxs string
-
-	// This is a handy utility function, but 
-	// maybe just implementing+using interface
-	// Stringser would be a better idea. 
-	lineSummaryFunc StringFunc
 }
 
 // RootNord is defined, so that assignments

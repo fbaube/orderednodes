@@ -18,7 +18,7 @@ import (
 //
 type FilePropsNord struct {
 	Nord
-	FU.FSItem
+	FU.FSObject
 }
 
 // Available to ensure that assignments to/from root node are explicit.
